@@ -15,4 +15,10 @@ apt-get install -y \
 
 cp /.clang-format .
 
+echo "Before"
+cat test/baby_sitter.h
+
 find . -name '*.h' -or -name '*.hpp' -or -name '*.cpp' | xargs clang-format-3.8 -i -style=file $1
+
+echo "After"
+cat test/baby_sitter.h
