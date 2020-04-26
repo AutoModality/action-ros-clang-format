@@ -21,5 +21,5 @@ git status
 git config --global user.email "you@example.com"
 git config --global user.name "Your Name"
 
-git commit -a -m "Code Format: Applied ROS Style"
+git commit -a -m "style: Applied ROS C++ Style Guide"
 git push origin HEAD
