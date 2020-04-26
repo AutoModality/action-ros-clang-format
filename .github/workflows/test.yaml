@@ -5,10 +5,10 @@ jobs:
   clang-format:
       runs-on: ubuntu-latest
       steps:
-      # stick to v1 checkout. see https://github.community/t5/GitHub-Actions/Push-from-action-even-with-PAT-does-not-trigger-action/m-p/46293#M6505
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: test format
         uses: ./
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - run: |
+          git status

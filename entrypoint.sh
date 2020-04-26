@@ -1,5 +1,7 @@
 #!/bin/sh -l
 
+set -e
+
 apt-get update
 apt-get install -y curl
 
@@ -14,5 +16,3 @@ apt-get install -y \
 cp /.clang-format .
 
 find . -name '*.h' -or -name '*.hpp' -or -name '*.cpp' | xargs clang-format-3.8 -i -style=file $1
-
-git status
