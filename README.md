@@ -1,4 +1,4 @@
-# action-ros-clang-format
+# ROS C++ Style Guide Github Action
 
 Github Action applying the ROS Style Guide to C++ code. 
 
