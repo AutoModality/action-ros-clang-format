@@ -1,6 +1,23 @@
 # action.yml
 name: 'ROS Style Guide C++ Format'
 description: 'Formats using clang in ROS Stlye and commits changes'
+inputs:
+  author-name:
+    description: 'The name that will appear in commits when changes needs to be committed'
+    required: false
+    default: Format Bot
+  author-email:
+    description: 'The email address that will appear in commits when changes needs to be committed'
+    required: false
+    default: formatter@github.bot
+  commit-message:
+    description: 'The commit message used when changes needs to be committed'
+    required: false
+    default: 'style: Applied ROS C++ Style Guide'
 runs:
   using: 'docker'
   image: 'Dockerfile'
+  args:
+    - ${{ inputs.author-name }}
+    - ${{ inputs.author-email }}
+    - ${{ inputs.commit-message }}

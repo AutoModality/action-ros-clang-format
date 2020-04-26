@@ -2,6 +2,10 @@
 
 set -e
 
+name=$1
+email=$2
+message=$3
+
 apt-get update
 apt-get install -y curl
 
@@ -18,8 +22,8 @@ cp /.clang-format .
 find . -name '*.h' -or -name '*.hpp' -or -name '*.cpp' | xargs clang-format-3.8 -i -style=file $1
 
 git status
-git config --global user.email "you@example.com"
-git config --global user.name "Your Name"
+git config --global user.email "$email"
+git config --global user.name "$name"
 
-git commit -a -m "style: Applied ROS C++ Style Guide"
+git commit -a -m "$message"
 git push origin HEAD
