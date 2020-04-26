@@ -14,26 +14,26 @@
 using namespace DJI::OSDK;
 
 DJISDKNode::DJISDKNode(ros::NodeHandle& nh, ros::NodeHandle& nh_private)
-  : telemetry_from_fc(USE_BROADCAST),
-    R_FLU2FRD(tf::Matrix3x3(1,  0,  0, 0, -1,  0, 0,  0, -1)),
-    R_ENU2NED(tf::Matrix3x3(0,  1,  0, 1,  0,  0, 0,  0, -1)),
-    curr_align_state(UNALIGNED)
+  : telemetry_from_fc(USE_BROADCAST)
+  , R_FLU2FRD(tf::Matrix3x3(1, 0, 0, 0, -1, 0, 0, 0, -1))
+  , R_ENU2NED(tf::Matrix3x3(0, 1, 0, 1, 0, 0, 0, 0, -1))
+  , curr_align_state(UNALIGNED)
 {
-  nh_private.param("serial_name",   serial_device, std::string("/dev/ttyUSB0"));
-  nh_private.param("baud_rate",     baud_rate, 921600);
-  nh_private.param("app_id",        app_id,    123456);
-  nh_private.param("app_version",   app_version, 1);
-  nh_private.param("enc_key",       enc_key, std::string("abcd1234"));
-  nh_private.param("drone_version", drone_version, std::string("M100")); // choose M100 as default
+  nh_private.param("serial_name", serial_device, std::string("/dev/ttyUSB0"));
+  nh_private.param("baud_rate", baud_rate, 921600);
+  nh_private.param("app_id", app_id, 123456);
+  nh_private.param("app_version", app_version, 1);
+  nh_private.param("enc_key", enc_key, std::string("abcd1234"));
+  nh_private.param("drone_version", drone_version, std::string("M100"));  // choose M100 as default
   nh_private.param("gravity_const", gravity_const, 9.801);
-  nh_private.param("align_time",    align_time_with_FC, false);
+  nh_private.param("align_time", align_time_with_FC, false);
   nh_private.param("use_broadcast", user_select_broadcast, false);
 
   //! Default values for local Position
-  local_pos_ref_latitude  = 0;
+  local_pos_ref_latitude = 0;
   local_pos_ref_longitude = 0;
-  local_pos_ref_altitude  = 0;
-  local_pos_ref_set       = false;
+  local_pos_ref_altitude = 0;
+  local_pos_ref_set = false;
 
   //! RTK support check
   rtkSupport = false;
@@ -71,7 +71,7 @@ DJISDKNode::DJISDKNode(ros::NodeHandle& nh, ros::NodeHandle& nh_private)
 
 DJISDKNode::~DJISDKNode()
 {
-  if(!isM100())
+  if (!isM100())
   {
     cleanUpSubscribeFromFC();
   }
@@ -81,8 +81,7 @@ DJISDKNode::~DJISDKNode()
   }
 }
 
-bool
-DJISDKNode::initVehicle(ros::NodeHandle& nh_private)
+bool DJISDKNode::initVehicle(ros::NodeHandle& nh_private)
 {
   bool threadSupport = true;
   bool enable_advanced_sensing = false;
@@ -110,13 +109,10 @@ DJISDKNode::initVehicle(ros::NodeHandle& nh_private)
   // This version of ROS Node works for:
   //    1. A3/N3/M600 with latest FW
   //    2. M100 with FW version M100_31
-  if(vehicle->getFwVersion() > INVALID_VERSION
-      && vehicle->getFwVersion() < mandatoryVersionBase
-      && (!isM100()))
+  if (vehicle->getFwVersion() > INVALID_VERSION && vehicle->getFwVersion() < mandatoryVersionBase && (!isM100()))
   {
     return false;
   }
-
 
   if (NULL != vehicle->subscribe && (!user_select_broadcast))
   {
@@ -168,43 +164,34 @@ bool DJISDKNode::initServices(ros::NodeHandle& nh) {
 }
 // clang-format on
 
-bool
-DJISDKNode::initFlightControl(ros::NodeHandle& nh)
+bool DJISDKNode::initFlightControl(ros::NodeHandle& nh)
 {
-  flight_control_sub = nh.subscribe<sensor_msgs::Joy>(
-    "dji_sdk/flight_control_setpoint_generic", 10, 
-    &DJISDKNode::flightControlSetpointCallback,   this);
+  flight_control_sub = nh.subscribe<sensor_msgs::Joy>("dji_sdk/flight_control_setpoint_generic", 10,
+                                                      &DJISDKNode::flightControlSetpointCallback, this);
 
-  flight_control_position_yaw_sub =
-    nh.subscribe<sensor_msgs::Joy>(
-      "dji_sdk/flight_control_setpoint_ENUposition_yaw", 10,
-      &DJISDKNode::flightControlPxPyPzYawCallback, this);
+  flight_control_position_yaw_sub = nh.subscribe<sensor_msgs::Joy>(
+      "dji_sdk/flight_control_setpoint_ENUposition_yaw", 10, &DJISDKNode::flightControlPxPyPzYawCallback, this);
 
-  flight_control_velocity_yawrate_sub =
-    nh.subscribe<sensor_msgs::Joy>(
-      "dji_sdk/flight_control_setpoint_ENUvelocity_yawrate", 10,
-      &DJISDKNode::flightControlVxVyVzYawrateCallback, this);
+  flight_control_velocity_yawrate_sub = nh.subscribe<sensor_msgs::Joy>(
+      "dji_sdk/flight_control_setpoint_ENUvelocity_yawrate", 10, &DJISDKNode::flightControlVxVyVzYawrateCallback, this);
 
   flight_control_rollpitch_yawrate_vertpos_sub =
-    nh.subscribe<sensor_msgs::Joy>(
-      "dji_sdk/flight_control_setpoint_rollpitch_yawrate_zposition", 10,
-      &DJISDKNode::flightControlRollPitchPzYawrateCallback, this);
+      nh.subscribe<sensor_msgs::Joy>("dji_sdk/flight_control_setpoint_rollpitch_yawrate_zposition", 10,
+                                     &DJISDKNode::flightControlRollPitchPzYawrateCallback, this);
 
   return true;
 }
 
 bool DJISDKNode::isM100()
 {
-  return(vehicle->isM100());
+  return (vehicle->isM100());
 }
 
-
-ACK::ErrorCode
-DJISDKNode::activate(int l_app_id, std::string l_enc_key)
+ACK::ErrorCode DJISDKNode::activate(int l_app_id, std::string l_enc_key)
 {
   usleep(1000000);
   Vehicle::ActivateData testActivateData;
-  char                  app_key[65];
+  char app_key[65];
   testActivateData.encKey = app_key;
   strcpy(testActivateData.encKey, l_enc_key.c_str());
   testActivateData.ID = l_app_id;
@@ -213,26 +200,22 @@ DJISDKNode::activate(int l_app_id, std::string l_enc_key)
   return vehicle->activate(&testActivateData, WAIT_TIMEOUT);
 }
 
-bool
-DJISDKNode::initSubscriber(ros::NodeHandle& nh)
+bool DJISDKNode::initSubscriber(ros::NodeHandle& nh)
 {
-  gimbal_angle_cmd_subscriber = nh.subscribe<dji_sdk::Gimbal>(
-    "dji_sdk/gimbal_angle_cmd", 10, &DJISDKNode::gimbalAngleCtrlCallback, this);
-  gimbal_speed_cmd_subscriber = nh.subscribe<geometry_msgs::Vector3Stamped>(
-    "dji_sdk/gimbal_speed_cmd", 10, &DJISDKNode::gimbalSpeedCtrlCallback, this);
+  gimbal_angle_cmd_subscriber =
+      nh.subscribe<dji_sdk::Gimbal>("dji_sdk/gimbal_angle_cmd", 10, &DJISDKNode::gimbalAngleCtrlCallback, this);
+  gimbal_speed_cmd_subscriber = nh.subscribe<geometry_msgs::Vector3Stamped>("dji_sdk/gimbal_speed_cmd", 10,
+                                                                            &DJISDKNode::gimbalSpeedCtrlCallback, this);
   return true;
 }
 
-bool
-DJISDKNode::initPublisher(ros::NodeHandle& nh)
+bool DJISDKNode::initPublisher(ros::NodeHandle& nh)
 {
   rc_publisher = nh.advertise<sensor_msgs::Joy>("dji_sdk/rc", 10);
 
-  attitude_publisher =
-    nh.advertise<geometry_msgs::QuaternionStamped>("dji_sdk/attitude", 10);
+  attitude_publisher = nh.advertise<geometry_msgs::QuaternionStamped>("dji_sdk/attitude", 10);
 
-  battery_state_publisher =
-    nh.advertise<sensor_msgs::BatteryState>("dji_sdk/battery_state",10);
+  battery_state_publisher = nh.advertise<sensor_msgs::BatteryState>("dji_sdk/battery_state", 10);
 
   /*!
    * - Fused attitude (duplicated from attitude topic)
@@ -243,15 +226,13 @@ DJISDKNode::initPublisher(ros::NodeHandle& nh)
   imu_publisher = nh.advertise<sensor_msgs::Imu>("dji_sdk/imu", 10);
 
   // Refer to dji_sdk.h for different enums for M100 and A3/N3
-  flight_status_publisher =
-    nh.advertise<std_msgs::UInt8>("dji_sdk/flight_status", 10);
+  flight_status_publisher = nh.advertise<std_msgs::UInt8>("dji_sdk/flight_status", 10);
 
   /*!
    * gps_health needs to be greater than 3 for gps_position and velocity topics
    * to be trusted
    */
-  gps_health_publisher =
-    nh.advertise<std_msgs::UInt8>("dji_sdk/gps_health", 10);
+  gps_health_publisher = nh.advertise<std_msgs::UInt8>("dji_sdk/gps_health", 10);
 
   /*!
    * NavSatFix specs:
@@ -260,8 +241,7 @@ DJISDKNode::initPublisher(ros::NodeHandle& nh)
    * west.
    *   Altitude [m]. Positive is above the WGS 84 ellipsoid
    */
-  gps_position_publisher =
-    nh.advertise<sensor_msgs::NavSatFix>("dji_sdk/gps_position", 10);
+  gps_position_publisher = nh.advertise<sensor_msgs::NavSatFix>("dji_sdk/gps_position", 10);
 
   /*!
    *   x [m]. Positive along navigation frame x axis
@@ -269,76 +249,53 @@ DJISDKNode::initPublisher(ros::NodeHandle& nh)
    *   z [m]. Positive is down
    *   For details about navigation frame, please see telemetry documentation in API reference
   */
-  vo_position_publisher =
-          nh.advertise<dji_sdk::VOPosition>("dji_sdk/vo_position", 10);
+  vo_position_publisher = nh.advertise<dji_sdk::VOPosition>("dji_sdk/vo_position", 10);
   /*!
    * Height above home altitude. It is valid only after drone
    * is armed.
    */
-  height_publisher =
-    nh.advertise<std_msgs::Float32>("dji_sdk/height_above_takeoff", 10);
+  height_publisher = nh.advertise<std_msgs::Float32>("dji_sdk/height_above_takeoff", 10);
 
-  velocity_publisher =
-    nh.advertise<geometry_msgs::Vector3Stamped>("dji_sdk/velocity", 10);
+  velocity_publisher = nh.advertise<geometry_msgs::Vector3Stamped>("dji_sdk/velocity", 10);
 
-  from_mobile_data_publisher =
-    nh.advertise<dji_sdk::MobileData>("dji_sdk/from_mobile_data", 10);
+  from_mobile_data_publisher = nh.advertise<dji_sdk::MobileData>("dji_sdk/from_mobile_data", 10);
 
-  from_payload_data_publisher =
-    nh.advertise<dji_sdk::PayloadData>("dji_sdk/from_payload_data", 10);
+  from_payload_data_publisher = nh.advertise<dji_sdk::PayloadData>("dji_sdk/from_payload_data", 10);
 
   // TODO: documentation and proper frame id
-  gimbal_angle_publisher =
-    nh.advertise<geometry_msgs::Vector3Stamped>("dji_sdk/gimbal_angle", 10);
+  gimbal_angle_publisher = nh.advertise<geometry_msgs::Vector3Stamped>("dji_sdk/gimbal_angle", 10);
 
-  local_position_publisher =
-      nh.advertise<geometry_msgs::PointStamped>("dji_sdk/local_position", 10);
+  local_position_publisher = nh.advertise<geometry_msgs::PointStamped>("dji_sdk/local_position", 10);
 
-  local_frame_ref_publisher =
-      nh.advertise<sensor_msgs::NavSatFix>("dji_sdk/local_frame_ref", 10, true);
+  local_frame_ref_publisher = nh.advertise<sensor_msgs::NavSatFix>("dji_sdk/local_frame_ref", 10, true);
 
-  time_sync_nmea_publisher =
-      nh.advertise<nmea_msgs::Sentence>("dji_sdk/time_sync_nmea_msg", 10);
+  time_sync_nmea_publisher = nh.advertise<nmea_msgs::Sentence>("dji_sdk/time_sync_nmea_msg", 10);
 
-  time_sync_gps_utc_publisher =
-      nh.advertise<dji_sdk::GPSUTC>("dji_sdk/time_sync_gps_utc", 10);
+  time_sync_gps_utc_publisher = nh.advertise<dji_sdk::GPSUTC>("dji_sdk/time_sync_gps_utc", 10);
 
-  time_sync_fc_utc_publisher =
-      nh.advertise<dji_sdk::FCTimeInUTC>("dji_sdk/time_sync_fc_time_utc", 10);
+  time_sync_fc_utc_publisher = nh.advertise<dji_sdk::FCTimeInUTC>("dji_sdk/time_sync_fc_time_utc", 10);
 
-  time_sync_pps_source_publisher =
-      nh.advertise<std_msgs::String>("dji_sdk/time_sync_pps_source", 10);
+  time_sync_pps_source_publisher = nh.advertise<std_msgs::String>("dji_sdk/time_sync_pps_source", 10);
 
 #ifdef ADVANCED_SENSING
-  stereo_240p_front_left_publisher =
-    nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_front_left_images", 10);
+  stereo_240p_front_left_publisher = nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_front_left_images", 10);
 
-  stereo_240p_front_right_publisher =
-    nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_front_right_images", 10);
+  stereo_240p_front_right_publisher = nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_front_right_images", 10);
 
-  stereo_240p_down_front_publisher =
-    nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_down_front_images", 10);
+  stereo_240p_down_front_publisher = nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_down_front_images", 10);
 
-  stereo_240p_down_back_publisher =
-    nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_down_back_images", 10);
+  stereo_240p_down_back_publisher = nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_down_back_images", 10);
 
-  stereo_240p_front_depth_publisher =
-    nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_front_depth_images", 10);
+  stereo_240p_front_depth_publisher = nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_240p_front_depth_images", 10);
 
-  stereo_vga_front_left_publisher =
-    nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_vga_front_left_images", 10);
+  stereo_vga_front_left_publisher = nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_vga_front_left_images", 10);
 
-  stereo_vga_front_right_publisher =
-    nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_vga_front_right_images", 10);
+  stereo_vga_front_right_publisher = nh.advertise<sensor_msgs::Image>("dji_sdk/stereo_vga_front_right_images", 10);
 
-  main_camera_stream_publisher =
-    nh.advertise<sensor_msgs::Image>("dji_sdk/main_camera_images", 10);
+  main_camera_stream_publisher = nh.advertise<sensor_msgs::Image>("dji_sdk/main_camera_images", 10);
 
-  fpv_camera_stream_publisher =
-    nh.advertise<sensor_msgs::Image>("dji_sdk/fpv_camera_images", 10);
+  fpv_camera_stream_publisher = nh.advertise<sensor_msgs::Image>("dji_sdk/fpv_camera_images", 10);
 #endif
-
-
 
   if (telemetry_from_fc == USE_BROADCAST)
   {
@@ -347,7 +304,7 @@ DJISDKNode::initPublisher(ros::NodeHandle& nh)
 
     uint8_t defaultFreq[16];
 
-    if(isM100())
+    if (isM100())
     {
       setUpM100DefaultFreq(defaultFreq);
     }
@@ -356,9 +313,8 @@ DJISDKNode::initPublisher(ros::NodeHandle& nh)
       setUpA3N3DefaultFreq(defaultFreq);
     }
 
-    broadcast_set_freq_ack =
-      vehicle->broadcast->setBroadcastFreq(defaultFreq, WAIT_TIMEOUT);
-//      vehicle->broadcast->setBroadcastFreqDefaults(WAIT_TIMEOUT);
+    broadcast_set_freq_ack = vehicle->broadcast->setBroadcastFreq(defaultFreq, WAIT_TIMEOUT);
+    //      vehicle->broadcast->setBroadcastFreqDefaults(WAIT_TIMEOUT);
 
     if (ACK::getError(broadcast_set_freq_ack))
     {
@@ -366,13 +322,12 @@ DJISDKNode::initPublisher(ros::NodeHandle& nh)
       return false;
     }
     // register a callback function whenever a broadcast data is in
-    vehicle->broadcast->setUserBroadcastCallback(
-      &DJISDKNode::SDKBroadcastCallback, this);
+    vehicle->broadcast->setUserBroadcastCallback(&DJISDKNode::SDKBroadcastCallback, this);
   }
   else if (telemetry_from_fc == USE_SUBSCRIBE)
   {
     ROS_INFO("Use data subscription to get telemetry data!");
-    if(!align_time_with_FC)
+    if (!align_time_with_FC)
     {
       ROS_INFO("align_time_with_FC set to false. We will use ros time to time stamp messages!");
     }
@@ -384,14 +339,11 @@ DJISDKNode::initPublisher(ros::NodeHandle& nh)
     // Extra topics that is only available from subscription
 
     // Details can be found in DisplayMode enum in dji_sdk.h
-    displaymode_publisher =
-      nh.advertise<std_msgs::UInt8>("dji_sdk/display_mode", 10);
+    displaymode_publisher = nh.advertise<std_msgs::UInt8>("dji_sdk/display_mode", 10);
 
-    angularRate_publisher =
-      nh.advertise<geometry_msgs::Vector3Stamped>("dji_sdk/angular_velocity_fused", 10);
+    angularRate_publisher = nh.advertise<geometry_msgs::Vector3Stamped>("dji_sdk/angular_velocity_fused", 10);
 
-    acceleration_publisher =
-      nh.advertise<geometry_msgs::Vector3Stamped>("dji_sdk/acceleration_ground_fused", 10);
+    acceleration_publisher = nh.advertise<geometry_msgs::Vector3Stamped>("dji_sdk/acceleration_ground_fused", 10);
 
     trigger_publisher = nh.advertise<sensor_msgs::TimeReference>("dji_sdk/trigger_time", 10);
 
@@ -400,8 +352,7 @@ DJISDKNode::initPublisher(ros::NodeHandle& nh)
       return false;
     }
   }
-  vehicle->moc->setFromMSDKCallback(&DJISDKNode::SDKfromMobileDataCallback,
-                                    this);
+  vehicle->moc->setFromMSDKCallback(&DJISDKNode::SDKfromMobileDataCallback, this);
   if (vehicle->payloadDevice)
   {
     vehicle->payloadDevice->setFromPSDKCallback(&DJISDKNode::SDKfromPayloadDataCallback, this);
@@ -417,8 +368,7 @@ DJISDKNode::initPublisher(ros::NodeHandle& nh)
   return true;
 }
 
-bool
-DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
+bool DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
 {
   ACK::ErrorCode ack = vehicle->subscribe->verify(WAIT_TIMEOUT);
   if (ACK::getError(ack))
@@ -431,9 +381,8 @@ DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
   topicList100Hz.push_back(Telemetry::TOPIC_ACCELERATION_GROUND);
   topicList100Hz.push_back(Telemetry::TOPIC_ANGULAR_RATE_FUSIONED);
 
-  int nTopic100Hz    = topicList100Hz.size();
-  if (vehicle->subscribe->initPackageFromTopicList(PACKAGE_ID_100HZ, nTopic100Hz,
-                                                   topicList100Hz.data(), 1, 100))
+  int nTopic100Hz = topicList100Hz.size();
+  if (vehicle->subscribe->initPackageFromTopicList(PACKAGE_ID_100HZ, nTopic100Hz, topicList100Hz.data(), 1, 100))
   {
     ack = vehicle->subscribe->startPackage(PACKAGE_ID_100HZ, WAIT_TIMEOUT);
     if (ACK::getError(ack))
@@ -444,8 +393,7 @@ DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
     }
     else
     {
-      vehicle->subscribe->registerUserPackageUnpackCallback(
-              PACKAGE_ID_100HZ, publish100HzData, this);
+      vehicle->subscribe->registerUserPackageUnpackCallback(PACKAGE_ID_100HZ, publish100HzData, this);
     }
   }
 
@@ -462,7 +410,7 @@ DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
   topicList50Hz.push_back(Telemetry::TOPIC_VELOCITY);
   topicList50Hz.push_back(Telemetry::TOPIC_GPS_CONTROL_LEVEL);
 
-  if(vehicle->getFwVersion() > versionBase33)
+  if (vehicle->getFwVersion() > versionBase33)
   {
     topicList50Hz.push_back(Telemetry::TOPIC_POSITION_VO);
     topicList50Hz.push_back(Telemetry::TOPIC_RC_WITH_FLAG_DATA);
@@ -470,22 +418,19 @@ DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
 
     // A3 and N3 has access to more buttons on RC
     std::string hardwareVersion(vehicle->getHwVersion());
-    if( (hardwareVersion == std::string(Version::N3)) || hardwareVersion == std::string(Version::A3))
+    if ((hardwareVersion == std::string(Version::N3)) || hardwareVersion == std::string(Version::A3))
     {
-      topicList50Hz.push_back(Telemetry::TOPIC_RC_FULL_RAW_DATA);      
+      topicList50Hz.push_back(Telemetry::TOPIC_RC_FULL_RAW_DATA);
     }
 
     // Advertise rc connection status only if this topic is supported by FW
-    rc_connection_status_publisher =
-            nh.advertise<std_msgs::UInt8>("dji_sdk/rc_connection_status", 10);
+    rc_connection_status_publisher = nh.advertise<std_msgs::UInt8>("dji_sdk/rc_connection_status", 10);
 
-    flight_anomaly_publisher =
-            nh.advertise<dji_sdk::FlightAnomaly>("dji_sdk/flight_anomaly", 10);
+    flight_anomaly_publisher = nh.advertise<dji_sdk::FlightAnomaly>("dji_sdk/flight_anomaly", 10);
   }
 
-  int nTopic50Hz    = topicList50Hz.size();
-  if (vehicle->subscribe->initPackageFromTopicList(PACKAGE_ID_50HZ, nTopic50Hz,
-                                                   topicList50Hz.data(), 1, 50))
+  int nTopic50Hz = topicList50Hz.size();
+  if (vehicle->subscribe->initPackageFromTopicList(PACKAGE_ID_50HZ, nTopic50Hz, topicList50Hz.data(), 1, 50))
   {
     ack = vehicle->subscribe->startPackage(PACKAGE_ID_50HZ, WAIT_TIMEOUT);
     if (ACK::getError(ack))
@@ -496,20 +441,15 @@ DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
     }
     else
     {
-      vehicle->subscribe->registerUserPackageUnpackCallback(
-              PACKAGE_ID_50HZ, publish50HzData, (UserData) this);
+      vehicle->subscribe->registerUserPackageUnpackCallback(PACKAGE_ID_50HZ, publish50HzData, (UserData) this);
     }
   }
 
   //! Check if RTK is supported in the FC
-  Telemetry::TopicName topicRTKSupport[] =
-  {
-    Telemetry::TOPIC_RTK_POSITION
-  };
+  Telemetry::TopicName topicRTKSupport[] = { Telemetry::TOPIC_RTK_POSITION };
 
-  int nTopicRTKSupport    = sizeof(topicRTKSupport)/sizeof(topicRTKSupport[0]);
-  if (vehicle->subscribe->initPackageFromTopicList(PACKAGE_ID_5HZ, nTopicRTKSupport,
-                                                   topicRTKSupport, 1, 10))
+  int nTopicRTKSupport = sizeof(topicRTKSupport) / sizeof(topicRTKSupport[0]);
+  if (vehicle->subscribe->initPackageFromTopicList(PACKAGE_ID_5HZ, nTopicRTKSupport, topicRTKSupport, 1, 10))
   {
     ack = vehicle->subscribe->startPackage(PACKAGE_ID_5HZ, WAIT_TIMEOUT);
     if (ack.data == ErrorCode::SubscribeACK::SOURCE_DEVICE_OFFLINE)
@@ -532,7 +472,7 @@ DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
   topicList5hz.push_back(Telemetry::TOPIC_GPS_DETAILS);
   topicList5hz.push_back(Telemetry::TOPIC_BATTERY_INFO);
 
-  if(rtkSupport)
+  if (rtkSupport)
   {
     topicList5hz.push_back(Telemetry::TOPIC_RTK_POSITION);
     topicList5hz.push_back(Telemetry::TOPIC_RTK_VELOCITY);
@@ -541,34 +481,27 @@ DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
     topicList5hz.push_back(Telemetry::TOPIC_RTK_POSITION_INFO);
 
     // Advertise rtk data only when rtk is supported
-    rtk_position_publisher =
-            nh.advertise<sensor_msgs::NavSatFix>("dji_sdk/rtk_position", 10);
+    rtk_position_publisher = nh.advertise<sensor_msgs::NavSatFix>("dji_sdk/rtk_position", 10);
 
-    rtk_velocity_publisher =
-            nh.advertise<geometry_msgs::Vector3Stamped>("dji_sdk/rtk_velocity", 10);
+    rtk_velocity_publisher = nh.advertise<geometry_msgs::Vector3Stamped>("dji_sdk/rtk_velocity", 10);
 
-    rtk_yaw_publisher =
-            nh.advertise<std_msgs::Int16>("dji_sdk/rtk_yaw", 10);
+    rtk_yaw_publisher = nh.advertise<std_msgs::Int16>("dji_sdk/rtk_yaw", 10);
 
-    rtk_position_info_publisher =
-            nh.advertise<std_msgs::UInt8>("dji_sdk/rtk_info_position", 10);
+    rtk_position_info_publisher = nh.advertise<std_msgs::UInt8>("dji_sdk/rtk_info_position", 10);
 
-    rtk_yaw_info_publisher =
-            nh.advertise<std_msgs::UInt8>("dji_sdk/rtk_info_yaw", 10);
+    rtk_yaw_info_publisher = nh.advertise<std_msgs::UInt8>("dji_sdk/rtk_info_yaw", 10);
 
-    if(vehicle->getFwVersion() > versionBase33)
+    if (vehicle->getFwVersion() > versionBase33)
     {
       topicList5hz.push_back(Telemetry::TOPIC_RTK_CONNECT_STATUS);
 
       // Advertise rtk connection only when rtk is supported
-      rtk_connection_status_publisher =
-              nh.advertise<std_msgs::UInt8>("dji_sdk/rtk_connection_status", 10);
+      rtk_connection_status_publisher = nh.advertise<std_msgs::UInt8>("dji_sdk/rtk_connection_status", 10);
     }
   }
 
-  int nTopic5hz    = topicList5hz.size();
-  if (vehicle->subscribe->initPackageFromTopicList(PACKAGE_ID_5HZ, nTopic5hz,
-                                                   topicList5hz.data(), 1, 5))
+  int nTopic5hz = topicList5hz.size();
+  if (vehicle->subscribe->initPackageFromTopicList(PACKAGE_ID_5HZ, nTopic5hz, topicList5hz.data(), 1, 5))
   {
     ack = vehicle->subscribe->startPackage(PACKAGE_ID_5HZ, WAIT_TIMEOUT);
     if (ACK::getError(ack))
@@ -579,8 +512,7 @@ DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
     }
     else
     {
-      vehicle->subscribe->registerUserPackageUnpackCallback(
-              PACKAGE_ID_5HZ, publish5HzData, (UserData) this);
+      vehicle->subscribe->registerUserPackageUnpackCallback(PACKAGE_ID_5HZ, publish5HzData, (UserData) this);
     }
   }
 
@@ -589,11 +521,10 @@ DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
   topicList400Hz.push_back(Telemetry::TOPIC_HARD_SYNC);
 
   int nTopic400Hz = topicList400Hz.size();
-  if (vehicle->subscribe->initPackageFromTopicList(PACKAGE_ID_400HZ, nTopic400Hz,
-                                                   topicList400Hz.data(), 1, 400))
+  if (vehicle->subscribe->initPackageFromTopicList(PACKAGE_ID_400HZ, nTopic400Hz, topicList400Hz.data(), 1, 400))
   {
     ack = vehicle->subscribe->startPackage(PACKAGE_ID_400HZ, WAIT_TIMEOUT);
-    if(ACK::getError(ack))
+    if (ACK::getError(ack))
     {
       vehicle->subscribe->removePackage(PACKAGE_ID_400HZ, WAIT_TIMEOUT);
       ROS_ERROR("Failed to start 400Hz package");
@@ -609,8 +540,7 @@ DJISDKNode::initDataSubscribeFromFC(ros::NodeHandle& nh)
   return true;
 }
 
-void
-DJISDKNode::cleanUpSubscribeFromFC()
+void DJISDKNode::cleanUpSubscribeFromFC()
 {
   vehicle->subscribe->removePackage(0, WAIT_TIMEOUT);
   vehicle->subscribe->removePackage(1, WAIT_TIMEOUT);
@@ -636,7 +566,7 @@ bool DJISDKNode::validateSerialDevice(LinuxSerialDevice* serialDevice)
     return (false);
   };
   usleep(100000);
-  if(serialDevice->serialRead(buf, BUFFER_SIZE))
+  if (serialDevice->serialRead(buf, BUFFER_SIZE))
   {
     ROS_INFO("Succeeded to read from serial device");
   }
@@ -651,45 +581,42 @@ bool DJISDKNode::validateSerialDevice(LinuxSerialDevice* serialDevice)
   return (true);
 }
 
-void
-DJISDKNode::setUpM100DefaultFreq(uint8_t freq[16])
+void DJISDKNode::setUpM100DefaultFreq(uint8_t freq[16])
 {
-  freq[0]  = DataBroadcast::FREQ_100HZ;
-  freq[1]  = DataBroadcast::FREQ_100HZ;
-  freq[2]  = DataBroadcast::FREQ_100HZ;
-  freq[3]  = DataBroadcast::FREQ_50HZ;
-  freq[4]  = DataBroadcast::FREQ_100HZ;
-  freq[5]  = DataBroadcast::FREQ_50HZ;
-  freq[6]  = DataBroadcast::FREQ_10HZ;
-  freq[7]  = DataBroadcast::FREQ_50HZ;
-  freq[8]  = DataBroadcast::FREQ_50HZ;
-  freq[9]  = DataBroadcast::FREQ_50HZ;
+  freq[0] = DataBroadcast::FREQ_100HZ;
+  freq[1] = DataBroadcast::FREQ_100HZ;
+  freq[2] = DataBroadcast::FREQ_100HZ;
+  freq[3] = DataBroadcast::FREQ_50HZ;
+  freq[4] = DataBroadcast::FREQ_100HZ;
+  freq[5] = DataBroadcast::FREQ_50HZ;
+  freq[6] = DataBroadcast::FREQ_10HZ;
+  freq[7] = DataBroadcast::FREQ_50HZ;
+  freq[8] = DataBroadcast::FREQ_50HZ;
+  freq[9] = DataBroadcast::FREQ_50HZ;
   freq[10] = DataBroadcast::FREQ_10HZ;
   freq[11] = DataBroadcast::FREQ_10HZ;
 }
 
-void
-DJISDKNode::setUpA3N3DefaultFreq(uint8_t freq[16])
+void DJISDKNode::setUpA3N3DefaultFreq(uint8_t freq[16])
 {
-  freq[0]  = DataBroadcast::FREQ_100HZ;
-  freq[1]  = DataBroadcast::FREQ_100HZ;
-  freq[2]  = DataBroadcast::FREQ_100HZ;
-  freq[3]  = DataBroadcast::FREQ_50HZ;
-  freq[4]  = DataBroadcast::FREQ_100HZ;
-  freq[5]  = DataBroadcast::FREQ_50HZ;
-  freq[6]  = DataBroadcast::FREQ_50HZ;
-  freq[7]  = DataBroadcast::FREQ_50HZ;
-  freq[8]  = DataBroadcast::FREQ_10HZ;
-  freq[9]  = DataBroadcast::FREQ_50HZ;
+  freq[0] = DataBroadcast::FREQ_100HZ;
+  freq[1] = DataBroadcast::FREQ_100HZ;
+  freq[2] = DataBroadcast::FREQ_100HZ;
+  freq[3] = DataBroadcast::FREQ_50HZ;
+  freq[4] = DataBroadcast::FREQ_100HZ;
+  freq[5] = DataBroadcast::FREQ_50HZ;
+  freq[6] = DataBroadcast::FREQ_50HZ;
+  freq[7] = DataBroadcast::FREQ_50HZ;
+  freq[8] = DataBroadcast::FREQ_10HZ;
+  freq[9] = DataBroadcast::FREQ_50HZ;
   freq[10] = DataBroadcast::FREQ_50HZ;
   freq[11] = DataBroadcast::FREQ_50HZ;
   freq[12] = DataBroadcast::FREQ_10HZ;
   freq[13] = DataBroadcast::FREQ_10HZ;
 }
 
-void DJISDKNode::gpsConvertENU(double &ENU_x, double &ENU_y,
-                                 double gps_t_lon, double gps_t_lat,
-                                 double gps_r_lon, double gps_r_lat)
+void DJISDKNode::gpsConvertENU(double& ENU_x, double& ENU_y, double gps_t_lon, double gps_t_lat, double gps_r_lon,
+                               double gps_r_lat)
 {
   double d_lon = gps_t_lon - gps_r_lon;
   double d_lat = gps_t_lat - gps_r_lat;
