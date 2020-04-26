@@ -15,6 +15,6 @@ apt-get install -y \
     git
 
 cp /.clang-format .
-find . -name '*.h' -or -name '*.hpp' -or -name '*.cpp' | xargs clang-format-3.8 --verbose -i -style=file $1
+find . -name '*.h' -or -name '*.hpp' -or -name '*.cpp' | xargs clang-format-3.8 -i -style=file $1
 
 git status
