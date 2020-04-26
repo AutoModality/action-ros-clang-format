@@ -20,12 +20,7 @@ private:
   const int NSECS_IN_MSECS = 1000000;
   const int MSECS_IN_SECS = 1000;
 
-  enum DeviceState
-  {
-    OK,
-    WARN,
-    ERROR
-  };
+  enum DeviceState { OK,WARN,ERROR};
 
   using ErrorCB = std::function<void()>;  // @suppress("Type cannot be resolved") // @suppress("Symbol is not resolved")
 
