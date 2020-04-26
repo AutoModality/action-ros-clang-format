@@ -19,7 +19,16 @@ apt-get install -y \
     git
 
 cp /.clang-format .
+
+echo "======================="
+echo "Applying style to files"
+echo "======================="
+
 find . -name '*.h' -or -name '*.hpp' -or -name '*.cpp' | xargs clang-format-3.8 -i -style=file $1
+
+echo "============================"
+echo "Committing to Current Branch"
+echo "============================"
 
 git status
 git config --global user.email "$email"
