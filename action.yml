@@ -1,5 +1,5 @@
 # action.yml
-name: 'ROS Style Guide C++ Format'
+name: 'ROS Style Guide C++ Formatter'
 description: 'Formats using clang in ROS Stlye and commits changes'
 author: Aaron Roller
 branding:
