@@ -23,7 +23,12 @@ apt-get install -y \
     clang-format-3.8 \
     git
 
-cp /.clang-format .
+# according to docs, the --style=file will find the .clang-file at the root placed by the Dockerfile copy
+# https://releases.llvm.org/3.8.0/tools/clang/docs/ClangFormat.html
+# Use -style=file to load style configuration from
+#                              .clang-format file located in one of the parent
+#                              directories of the source file (or current
+#                              directory for stdin).
 
 echo "======================="
 echo "Applying style to files"
@@ -39,6 +44,6 @@ git status
 git config --global user.email "$email"
 git config --global user.name "$name"
 git add .
-git reset -- .clang-format
+#don't complain if there are no changes...which happens often
 git diff --quiet && git diff --staged --quiet || git commit -m "$message"
 git push origin HEAD
