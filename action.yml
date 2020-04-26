@@ -1,0 +1,6 @@
+# action.yml
+name: 'ROS Style Guide C++ Format'
+description: 'Formats using clang in ROS Stlye and commits changes'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
