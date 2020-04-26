@@ -38,6 +38,7 @@ echo "============================"
 git status
 git config --global user.email "$email"
 git config --global user.name "$name"
-
-git commit -a -m "$message"
+git add .
+git reset -- .clang-format
+git commit -m "$message"
 git push origin HEAD
