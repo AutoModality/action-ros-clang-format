@@ -1,6 +1,6 @@
 name: Code Formatter
 on:
-  pull_request:
+  push:
 jobs:
   clang-format:
       runs-on: ubuntu-latest
