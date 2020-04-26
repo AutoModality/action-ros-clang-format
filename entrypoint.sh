@@ -1,13 +1,13 @@
 #!/bin/sh -l
 
-sudo apt update
-sudo apt install -y curl
+apt update
+apt install -y curl
 
 curl -1sLf \
   'https://dl.cloudsmith.io/public/automodality/public/cfg/setup/bash.deb.sh' \
   | sudo bash
 
-sudo apt install -y \
+apt install -y \
     libllvm3.8 \
     clang-format-3.8
 
