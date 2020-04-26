@@ -9,6 +9,11 @@ message=$3
 apt-get update
 apt-get install -y curl
 
+# keep in method to avoid parameter mingling
+apply_style(){
+  find . -name '*.h' -or -name '*.hpp' -or -name '*.cpp' | xargs clang-format-3.8 -i -style=file $1
+}
+
 curl -1sLf \
   'https://dl.cloudsmith.io/public/automodality/public/cfg/setup/bash.deb.sh' \
   | bash
@@ -24,7 +29,7 @@ echo "======================="
 echo "Applying style to files"
 echo "======================="
 
-find . -name '*.h' -or -name '*.hpp' -or -name '*.cpp' | xargs clang-format-3.8 -i -style=file $1
+apply_style
 
 echo "============================"
 echo "Committing to Current Branch"
