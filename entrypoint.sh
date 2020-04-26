@@ -18,7 +18,8 @@ cp /.clang-format .
 find . -name '*.h' -or -name '*.hpp' -or -name '*.cpp' | xargs clang-format-3.8 -i -style=file $1
 
 git status
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
 
-git add  .
-git commit -m "Code Format: Applied ROS Style"
+git commit -a -m "Code Format: Applied ROS Style"
 git push origin HEAD
