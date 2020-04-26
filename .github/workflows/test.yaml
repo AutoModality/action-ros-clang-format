@@ -1,13 +1,12 @@
-name: Testing formatter
+name: Code Formatter
 on:
-  push:
+  pull_request:
 jobs:
   clang-format:
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v2
-      - name: test format
-        uses: ./
+      - uses: ./
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
