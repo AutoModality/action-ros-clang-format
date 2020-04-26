@@ -40,5 +40,5 @@ git config --global user.email "$email"
 git config --global user.name "$name"
 git add .
 git reset -- .clang-format
-git commit -m "$message"
+git diff --quiet && git diff --staged --quiet || git commit -m "$message"
 git push origin HEAD
