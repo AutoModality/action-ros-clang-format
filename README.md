@@ -2,11 +2,13 @@
 
 Github Action applying the ROS Style Guide to C++ code. 
 
-Recommended to invoke upon pull request, this will apply the code format that matches the 
+This Action will format the code to match the 
 [ROS C++ Style Guide](http://wiki.ros.org/CppStyleGuide) using 
 [clang-format-3.8](https://releases.llvm.org/3.8.0/tools/clang/docs/ClangFormatStyleOptions.html) 
 with the configuration from [davetcoleman/roscpp_code_format](https://github.com/davetcoleman/roscpp_code_format).
 
+It is recommended to add this to `formatter.yml` that runs on `pull_request` 
+so it only formats when the code is stablizing and ready to merge into master.
 
 ## Usage
 
@@ -43,3 +45,8 @@ inputs:
     required: false
     default: 'style: Applied ROS C++ Style Guide'
 ```
+
+### Override Format
+
+Simply check in your `.clang-format` file in the root of your project and it will overwrite
+the default style provided. (Not yet verified)
