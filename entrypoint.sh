@@ -47,9 +47,9 @@ if [[ $? == 0 ]] ;then
 
   git config --global user.email "$email"
   git config --global user.name "$name"
-  git config --global push.default current
+  current_branch=$(git rev-parse --abbrev-ref HEAD)
   git commit -a -m "$message"
-  git push
+  git push origin HEAD:"$current_branch"
 else
   echo "No changes to commit"
 fi
