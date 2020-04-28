@@ -47,7 +47,7 @@ DJISDKNode::DJISDKNode(ros::NodeHandle& nh, ros::NodeHandle& nh_private)
 
   else
   {
-  if (!initServices(nh))
+    if (!initServices(nh))
     {
       ROS_ERROR("initServices failed");
     }
