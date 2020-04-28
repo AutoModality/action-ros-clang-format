@@ -45,7 +45,7 @@ if [[ $? == 0 ]] ;then
   git config --global user.email "$email"
   git config --global user.name "$name"
   git commit -a -m "$message"
-  git push origin HEAD
+  git push origin "$GITHUB_REF"
 else
   echo "No changes to commit"
 fi
