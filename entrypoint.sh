@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -e
 
 name=$1
 email=$2
