@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -e
 
 name=$1
 email=$2
@@ -36,10 +35,12 @@ echo "======================="
 
 apply_style
 
-git status | grep modified || true
-
+modified_files=$(git status | grep modified)
 
 if [[ $? == 0 ]] ;then
+
+  echo $modified_files
+  echo
   echo "============================"
   echo "Committing to Current Branch"
   echo "============================"
