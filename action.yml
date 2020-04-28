@@ -1,5 +1,5 @@
 # action.yml
-name: 'ROS Style Guide C++ Format'
+name: 'ROS Style Guide C++ Formatter'
 description: 'Formats using clang in ROS Stlye and commits changes'
 author: Aaron Roller
 branding:
@@ -15,7 +15,7 @@ inputs:
     required: false
     default: formatter@github.bot
   commit-message:
-    description: 'The commit message used when changes needs to be committed'
+    description: 'The commit message used when changes need to be committed'
     required: false
     default: 'style: Applied ROS C++ Style Guide'
 runs:

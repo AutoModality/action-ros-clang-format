@@ -1,6 +1,5 @@
-#!/bin/sh -l
+#!/bin/bash
 
-set -e
 
 name=$1
 email=$2
@@ -23,7 +22,12 @@ apt-get install -y \
     clang-format-3.8 \
     git
 
-cp /.clang-format .
+# according to docs, the --style=file will find the .clang-file at the root placed by the Dockerfile copy
+# https://releases.llvm.org/3.8.0/tools/clang/docs/ClangFormat.html
+# Use -style=file to load style configuration from
+#                              .clang-format file located in one of the parent
+#                              directories of the source file (or current
+#                              directory for stdin).
 
 echo "======================="
 echo "Applying style to files"
@@ -31,14 +35,20 @@ echo "======================="
 
 apply_style
 
-echo "============================"
-echo "Committing to Current Branch"
-echo "============================"
+modified_files=$(git status | grep modified)
 
-git status
-git config --global user.email "$email"
-git config --global user.name "$name"
-git add .
-git reset -- .clang-format
-git diff --quiet && git diff --staged --quiet || git commit -m "$message"
-git push origin HEAD
+if [[ $? == 0 ]] ;then
+
+  echo $modified_files
+  echo
+  echo "============================"
+  echo "Committing to Current Branch"
+  echo "============================"
+
+  git config --global user.email "$email"
+  git config --global user.name "$name"
+  git commit -a -m "$message"
+  git push origin "$GITHUB_REF"
+else
+  echo "No changes to commit"
+fi

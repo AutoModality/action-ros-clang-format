@@ -10,6 +10,11 @@ with the configuration from [davetcoleman/roscpp_code_format](https://github.com
 It is recommended to add this to `formatter.yml` that runs on `pull_request` 
 so it only formats when the code is stablizing and ready to merge into master.
 
+# Features
+* formats C++ code to match the ROS Style guide
+* Commits modified code to branch
+* Future Enhancement: Pass custom `.clang-format` file
+
 ## Usage
 
 ```
@@ -46,7 +51,4 @@ inputs:
     default: 'style: Applied ROS C++ Style Guide'
 ```
 
-### Override Format
 
-Simply check in your `.clang-format` file in the root of your project and it will overwrite
-the default style provided. (Not yet verified)
