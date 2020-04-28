@@ -7,12 +7,13 @@ This Action will format the code to match the
 [clang-format-3.8](https://releases.llvm.org/3.8.0/tools/clang/docs/ClangFormatStyleOptions.html) 
 with the configuration from [davetcoleman/roscpp_code_format](https://github.com/davetcoleman/roscpp_code_format).
 
-It is recommended to add this to `formatter.yml` that runs on `pull_request` 
-so it only formats when the code is stablizing and ready to merge into master.
+It is required to add this to `formatter.yml` that runs on `push` after a build is successful and ready for a pull request.
+Github Actions triggered by pull request unfortunately have a detached head and do not allow committing to the same branch.
 
 # Features
 * formats C++ code to match the ROS Style guide
 * Commits modified code to branch
+* Supports push triggers (not pull requests)
 * Future Enhancement: Pass custom `.clang-format` file
 
 ## Usage
@@ -20,7 +21,7 @@ so it only formats when the code is stablizing and ready to merge into master.
 ```
 name: Code Formatter
 on:
-  pull_request:
+  push:
 jobs:
   clang-format:
       runs-on: ubuntu-latest
