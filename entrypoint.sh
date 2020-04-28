@@ -4,6 +4,7 @@
 name=$1
 email=$2
 message=$3
+branch=$4
 
 apt-get update
 apt-get install -y curl
@@ -47,9 +48,11 @@ if [[ $? == 0 ]] ;then
 
   git config --global user.email "$email"
   git config --global user.name "$name"
-  current_branch=$(git rev-parse --abbrev-ref HEAD)
+  if [[ $branch == "None" ]];then
+    branch=$(git rev-parse --abbrev-ref HEAD)
+  fi
   git commit -a -m "$message"
-  git push origin HEAD:"$current_branch"
+  git push origin HEAD:"$branch"
 else
   echo "No changes to commit"
 fi
