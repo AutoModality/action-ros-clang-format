@@ -52,9 +52,10 @@ if [[ $? == 0 ]] ;then
     branch=$(git rev-parse --abbrev-ref HEAD)
   fi
   git commit -a -m "$message"
-  echo "Pushing to $branch"
   
-  git push origin $branch
+  echo "Pushing to $GITHUB_REF"
+
+  git push origin HEAD:"$GITHUB_REF"
 else
   echo "No changes to commit"
 fi
