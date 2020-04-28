@@ -51,7 +51,4 @@ inputs:
     default: 'style: Applied ROS C++ Style Guide'
 ```
 
-### Override Format
 
-Simply check in your `.clang-format` file in the root of your project and it will overwrite
-the default style provided. (Not yet verified)
