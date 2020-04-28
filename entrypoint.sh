@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 
 name=$1
 email=$2
@@ -35,14 +36,14 @@ echo "======================="
 
 apply_style
 
-modified_files=$(git status | grep modified)
+git status | grep modified || true
+
 
 if [[ $? == 0 ]] ;then
   echo "============================"
   echo "Committing to Current Branch"
   echo "============================"
-  echo $modified_files
-  echo
+
   git config --global user.email "$email"
   git config --global user.name "$name"
   git commit -a -m "$message"
