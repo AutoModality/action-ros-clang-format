@@ -43,7 +43,7 @@ DJISDKNode::DJISDKNode(ros::NodeHandle& nh, ros::NodeHandle& nh_private)
   if (!initVehicle(nh_private))
   {
     ROS_ERROR("Vehicle initialization failed");
-  }
+}
 
   else
   {
