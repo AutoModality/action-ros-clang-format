@@ -36,14 +36,16 @@ echo "======================="
 
 apply_style
 
-echo "============================"
-echo "Committing to Current Branch"
-echo "============================"
+git staus | grep modified
 
-git status
-git config --global user.email "$email"
-git config --global user.name "$name"
-git add .
-#don't complain if there are no changes...which happens often
-git diff --quiet && git diff --staged --quiet || git commit -a -m "$message"
-git push origin HEAD
+if [[ $? == 0 ]] ;then
+  echo "============================"
+  echo "Committing to Current Branch"
+  echo "============================"
+  git config --global user.email "$email"
+  git config --global user.name "$name"
+  git commit -a -m "$message"
+  git push origin HEAD
+else
+  echo "No changes to commit"
+fi
