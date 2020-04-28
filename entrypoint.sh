@@ -36,7 +36,7 @@ echo "======================="
 
 apply_style
 
-git staus | grep modified
+git status | grep modified
 
 if [[ $? == 0 ]] ;then
   echo "============================"
