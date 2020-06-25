@@ -18,6 +18,10 @@ inputs:
     description: 'The commit message used when changes need to be committed'
     required: false
     default: 'style: Applied ROS C++ Style Guide'
+  branch:
+    description: 'The branch the changes will be committed.'
+    required: false
+    default: 'None'
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -25,3 +29,4 @@ runs:
     - ${{ inputs.author-name }}
     - ${{ inputs.author-email }}
     - ${{ inputs.commit-message }}
+    - ${{ inputs.branch }}

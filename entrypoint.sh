@@ -4,6 +4,7 @@
 name=$1
 email=$2
 message=$3
+branch=$4
 
 apt-get update
 apt-get install -y curl
@@ -47,9 +48,14 @@ if [[ $? == 0 ]] ;then
 
   git config --global user.email "$email"
   git config --global user.name "$name"
-  git config --global push.default current
+  if [[ $branch == "None" ]];then
+    branch=$(git rev-parse --abbrev-ref HEAD)
+  fi
   git commit -a -m "$message"
-  git push
+  
+  echo "Pushing to $GITHUB_REF"
+
+  git push origin HEAD:"$GITHUB_REF"
 else
   echo "No changes to commit"
 fi
