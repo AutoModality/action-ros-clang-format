@@ -35,6 +35,8 @@ echo "======================="
 
 apply_style
 
+git config --global --add safe.directory $PWD
+
 modified_files=$(git status | grep modified)
 
 if [[ $? == 0 ]] ;then
@@ -45,6 +47,7 @@ if [[ $? == 0 ]] ;then
   echo "Committing to Current Branch"
   echo "============================"
 
+  git config --global --add safe.directory $PWD
   git config --global user.email "$email"
   git config --global user.name "$name"
   git config --global push.default current
